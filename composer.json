@@ -10,7 +10,7 @@
     { "name": "jgauthi", "url": "https://github.com/jgauthi" }
   ],
   "require": {
-    "php": ">=5.6.0",
+    "php": ">=7.4.0",
     "ext-pdo": "*"
   },
   "autoload": {

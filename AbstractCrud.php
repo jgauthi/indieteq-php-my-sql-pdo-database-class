@@ -5,7 +5,7 @@
 * @author		Vivek Wicky Aswal. (https://twitter.com/#!/VivekWickyAswal)
 * @contrib 		jgauthi (https://github.com/jgauthi)
 *
-* @version      1.1
+* @version      2.0
 */
 
 namespace Jgauthi\Component\Database;
@@ -14,23 +14,18 @@ use PDO;
 
 abstract class AbstractCrud
 {
-    protected $db;
-    public $variables = [];
+    protected DB $db;
+    public array $variables = [];
 
     // (Abstract) MUST BE Declare on CRUD child
-    const TABLE = 'table';	// Your Table name
-    const PK = 'id';		// Primary Key of the Table
+    public const TABLE = 'table';	// Your Table name
+    public const PK = 'id';		    // Primary Key of the Table
 
     // Check fields before init object (optional)
-    public $list_fields_table = [];
-    protected $required_fields = [];
+    public array $list_fields_table = [];
+    protected array $required_fields = [];
 
-	/**
-	 * AbstractCrud constructor.
-	 * @param Db $db
-	 * @param array $data
-	 */
-    public function __construct(Db &$db, $data = [])
+    public function __construct(Db &$db, array $data = [])
     {
         $this->db = $db;
         $this->variables = $data;
@@ -40,7 +35,7 @@ abstract class AbstractCrud
 	 * @param string $name
 	 * @param mixed $value
 	 */
-    public function __set($name, $value)
+    public function __set(string $name, $value)
     {
         if ($name === static::PK) {
             $this->variables[static::PK] = $value;
@@ -53,7 +48,7 @@ abstract class AbstractCrud
 	 * @param string $name
 	 * @return mixed|null
 	 */
-    public function __get($name)
+    public function __get(string $name)
     {
         if (isset($this->$name)) { // use magic method: __isset
             return $this->variables[$name];
@@ -62,11 +57,7 @@ abstract class AbstractCrud
         return null;
     }
 
-	/**
-	 * @param string $name
-	 * @return bool
-	 */
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
         if (is_array($this->variables) && array_key_exists($name, $this->variables)) {
             return true;
@@ -75,10 +66,7 @@ abstract class AbstractCrud
         return false;
     }
 
-	/**
-	 * @param string $name
-	 */
-    public function __unset($name)
+    public function __unset(string $name): void
     {
         if (isset($this->$name)) { // use magic method: __isset
             unset($this->variables[$name]);
@@ -178,11 +166,6 @@ abstract class AbstractCrud
     }
 
     /**
-     * @param array $fields
-     * @param array $sort
-     *
-     * @return array of Collection.
-	 *
      *  Example: $user = new User;
      *  $found_user_array = $user->search(array('sex' => 'Male', 'age' => '18'), array('dob' => 'DESC'));
      *  // Will produce: SELECT * FROM ".static::TABLE." WHERE sex = :sex AND age = :age ORDER BY dob DESC;
@@ -190,7 +173,7 @@ abstract class AbstractCrud
      *  // Now we can use for each on $found_user_array.
      *  Other functionalities ex: Support for LIKE, >, <, >=, <= ... Are not yet supported.
      */
-    public function search($fields = [], $sort = [], $limit = 0)
+    public function search(array $fields = [], array $sort = [], int $limit = 0): array
     {
         $bindings = empty($fields) ? $this->variables : $fields;
 
@@ -222,11 +205,9 @@ abstract class AbstractCrud
     }
 
 	/**
-	 * @param array $sort
-	 * @param bool $array_keys_primary_key
 	 * @return array|int|null
 	 */
-    public function all($sort = [], $array_keys_primary_key = false)
+    public function all(array $sort = [], bool $array_keys_primary_key = false)
     {
         $select = '*';
         $args = null;
@@ -250,55 +231,35 @@ abstract class AbstractCrud
         return $this->db->query($sql, $args, $fetchmode);
     }
 
-	/**
-	 * @param string $field
-	 * @return string
-	 */
-    public function min($field)
+    public function min(string $field): string
     {
         if ($field) {
             return $this->db->single("SELECT min({$field}) FROM ".static::TABLE);
         }
     }
 
-	/**
-	 * @param string $field
-	 * @return string
-	 */
-    public function max($field)
+    public function max(string $field): string
     {
         if ($field) {
             return $this->db->single("SELECT max({$field}) FROM ".static::TABLE);
         }
     }
 
-	/**
-	 * @param string $field
-	 * @return string
-	 */
-    public function avg($field)
+    public function avg(string $field): string
     {
         if ($field) {
             return $this->db->single("SELECT avg({$field}) FROM ".static::TABLE);
         }
     }
 
-	/**
-	 * @param string $field
-	 * @return string
-	 */
-    public function sum($field)
+    public function sum(string $field): string
     {
         if ($field) {
             return $this->db->single("SELECT sum({$field}) FROM ".static::TABLE);
         }
     }
 
-	/**
-	 * @param string $field
-	 * @return string
-	 */
-    public function count($field)
+    public function count(string $field): string
     {
         if ($field) {
             return $this->db->single("SELECT count({$field}) FROM ".static::TABLE);
@@ -306,11 +267,9 @@ abstract class AbstractCrud
     }
 
 	/**
-	 * @param string $sql
-	 * @param array|null $params
 	 * @return array|int|null
 	 */
-    private function exec($sql, $params = null)
+    private function exec(string $sql, ?array $params = null)
     {
         if (null !== $params) {
             // Get result with the DB object
@@ -328,9 +287,8 @@ abstract class AbstractCrud
 
 	/**
 	 * Check fields before init object (optional)
-	 * @return bool
 	 */
-	public function check_fields()
+	public function check_fields(): bool
     {
         // Prerequisites
         if (empty($this->variables)) {
@@ -369,9 +327,8 @@ abstract class AbstractCrud
 
 	/**
 	 * Vérifier qu'un dossier avec le même code n'existe pas déjà
-	 * @return bool
 	 */
-	public function exists()
+	public function exists(): bool
     {
         if (empty($this->variables[static::PK])) {
             return false;

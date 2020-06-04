@@ -4,7 +4,7 @@ PDO Database Class
 A database class for PHP-MySQL which uses the PDO extension.
 
 ## To use the class
-### 1. Install the library (PHP5.6 version)
+### 1. Install the library (PHP 7.4+ version)
 Edit your [composer.json](https://getcomposer.org) (launch `composer update` after edit):
 ```json
 {
@@ -12,12 +12,12 @@ Edit your [composer.json](https://getcomposer.org) (launch `composer update` aft
 		{ "type": "git", "url": "git@github.com:jgauthi/indieteq-php-my-sql-pdo-database-class.git" }
 	],
 	"require": {
-		"jgauthi/indieteq-php-my-sql-pdo-database-class": "1.*"
+		"jgauthi/indieteq-php-my-sql-pdo-database-class": "dev-master"
 	}
 }
 ```
 
-The PHP 7 version is available, [read more](https://github.com/jgauthi/indieteq-php-my-sql-pdo-database-class).
+You can can use the PHP 5.6 version, [read more](https://github.com/jgauthi/indieteq-php-my-sql-pdo-database-class/tree/v1.1).
 
 
 ### 2. Require the class in your project
@@ -237,10 +237,10 @@ use Jgauthi\Component\Database\AbstractCrud;
 class YourClass Extends AbstractCrud
 {
   # The table you want to perform the database actions on
-  const TABLE = 'persons';
+  public const TABLE = 'persons';
 
   # Primary Key of the table
-  const PK = 'Id';
+  public const PK = 'Id';
 }
 ```
 
@@ -271,7 +271,7 @@ $created = $person->Create();
 ```php
 <?php
 // Delete person
-$person->Id  = '17';
+$person->Id  = 17;
 $deleted     = $person->Delete();
 
 // Shorthand method, give id as parameter
@@ -329,8 +329,8 @@ $persons = $person->all(['lastname' => 'ASC', 'firstname' => 'ASC'], false);
 <?php
 class Person Extends AbstractCrud
 {
-  const TABLE = 'persons';
-  const PK = 'Id';
+  public const TABLE = 'persons';
+  public const PK = 'Id';
 
 	public function __construct(Db &$db)
 	{
@@ -366,7 +366,7 @@ if($person->check_fields())
 	$person->create();
 
 // working
-$person->Firstname = "John";
+$person->Firstname = 'John';
 if($person->check_fields())
 	$person->create();
 

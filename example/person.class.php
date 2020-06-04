@@ -4,10 +4,10 @@ use Jgauthi\Component\Database\AbstractCrud;
 class Person extends AbstractCrud
 {
     // Your Table name
-    protected $table = 'persons';
+    protected string $table = 'persons';
 
     // Primary Key of the Table
-    protected $pk = 'id';
+    protected string $pk = 'id';
 
     public function create()
     {

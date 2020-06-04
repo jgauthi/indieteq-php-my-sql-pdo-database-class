@@ -1,6 +1,6 @@
 <?php
 /**
- *  DB - A simple database class (PHP 5.6 version)
+ *  DB - A simple database class (PHP 7.4+ version)
  *
  * @author		Author: Vivek Wicky Aswal. (https://twitter.com/#!/VivekWickyAswal)
  * @contrib     jgauthi (https://github.com/jgauthi)
@@ -12,44 +12,26 @@
 namespace Jgauthi\Component\Database;
 
 use PDO;
+use PDOStatement;
 
 class Db
 {
-    // @object, The PDO object
-    private $pdo;
-
-    // @object, PDO statement object
-    private $sQuery;
-
-    // @array,  The database settings
-    private $settings;
-
-    // @bool ,  Connected to the database
-    private $bConnected = false;
-
-    // @object, Object for logging exceptions
+    private ?PDO $pdo;
+    private PDOStatement $sQuery;
+    private array $settings;
+    private bool $bConnected = false;
     private $debug = false;
+    private array $parameters;
+    public array $table = [];
 
-    // @array, The parameters of the SQL query
-    private $parameters;
-    public $table = [];
-
-	/**
-	 * Db constructor.
-	 * @param string $host
-	 * @param string $user
-	 * @param string $pass
-	 * @param string $dbname
-	 * @param int $port
-	 */
-    public function __construct($host, $user, $pass, $dbname, $port = 3306)
+    public function __construct(string $host, string $user, string $pass, string $dbname, int $port = 3306)
     {
         $this->settings = [
             'host' 		=> $host,
             'user' 		=> $user,
             'password' 	=> $pass,
             'dbname' 	=> $dbname,
-            'port' 		=> intval($port),
+            'port' 		=> $port,
         ];
 
         $this->Connect();
@@ -65,10 +47,8 @@ class Db
 	 *	2. Puts  the ini content into the settings array.
 	 *	3. Tries to connect to the database.
 	 *	4. If connection failed, exception is displayed and a log file gets created.
-	 *
-	 * @return bool
 	 */
-    private function Connect()
+    private function Connect(): bool
     {
         $dsn = "mysql:dbname={$this->settings['dbname']};host={$this->settings['host']};port={$this->settings['port']}";
         try {
@@ -97,7 +77,7 @@ class Db
      *   You can use this little method if you want to close the PDO connection
      *
      */
-    public function CloseConnection()
+    public function CloseConnection(): void
     {
         // Set the PDO object to null to close the connection
         // http://www.php.net/manual/en/pdo.connections.php
@@ -113,12 +93,8 @@ class Db
 	 *	4. Execute Query.
 	 *	5. On exception : Write Exception into the log + SQL query.
 	 *	6. Reset the Parameters.
-	 *
-	 * @param string $query
-	 * @param array $parameters
-	 * @return bool
 	 */
-    private function Init($query, $parameters = [])
+    private function Init(string $query, ?array $parameters = []): bool
     {
         // Connect to database
         if (!$this->bConnected) {
@@ -173,31 +149,24 @@ class Db
 
     /**
      * Return PDO var: to use with other library.
-	 * @return PDO
      */
-    public function getPdoVar()
+    public function getPdoVar(): PDO
     {
         return $this->pdo;
     }
 
-    /**
-     * @param bool $debug
-     */
-    public function setDebug($debug = true)
+    public function setDebug(bool $debug = true): self
     {
-        $this->debug = boolval($debug);
+        $this->debug = $debug;
+        return $this;
     }
 
     //-- Mysql Requests -------------------------------------------------------------------------------
 
     /**
      * Add the parameter to the parameter array
-     *
-     * @param string $para
-     * @param string $value
-	 * @return self
      */
-    public function bind($para, $value)
+    public function bind(string $para, ?string $value): self
     {
         $this->parameters[sizeof($this->parameters)] = [':'.$para, $value];
         return $this;
@@ -205,11 +174,8 @@ class Db
 
     /**
      * Add more parameters to the parameter array
-     *
-     * @param array $parray
-	 * @return self
      */
-    public function bindMore($parray)
+    public function bindMore(?array $parray): self
     {
         if (empty($this->parameters) && is_array($parray)) {
             $columns = array_keys($parray);
@@ -222,16 +188,12 @@ class Db
     }
 
     /**
-     *  If the SQL query  contains a SELECT or SHOW statement it returns an array containing all of the result set row
+     *  If the SQL query contains a SELECT or SHOW statement it returns an array containing all of the result set row
      *	If the SQL statement is a DELETE, INSERT, or UPDATE statement it returns the number of affected rows.
-     *
-     * @param  string $query
-     * @param  array  $params
-     * @param  int    $fetchmode
      *
      * @return int|array|null
      */
-    public function query($query, $params = null, $fetchmode = PDO::FETCH_ASSOC)
+    public function query(string $query, ?array $params = null, int $fetchmode = PDO::FETCH_ASSOC)
     {
         $query = trim(str_replace("\r", ' ', $query));
 
@@ -255,20 +217,16 @@ class Db
 
     /**
      * Returns the last inserted id.
-     *
-     * @return int
      */
-    public function lastInsertId()
+    public function lastInsertId(): int
     {
         return $this->pdo->lastInsertId();
     }
 
     /**
      * Return nb rows from last query.
-     *
-     * @return int|null
      */
-    public function numRows()
+    public function numRows(): ?int
     {
         if (is_null($this->sQuery)) {
             return null;
@@ -285,43 +243,32 @@ class Db
 
     /**
      * Starts the transaction.
-     *
-     * @return boolean, true on success or false on failure
      */
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
         return $this->pdo->beginTransaction();
     }
 
     /**
      * Execute Transaction.
-     *
-     * @return boolean, true on success or false on failure
      */
-    public function executeTransaction()
+    public function executeTransaction(): bool
     {
         return $this->pdo->commit();
     }
 
     /**
      * Rollback of Transaction.
-     *
-     * @return boolean, true on success or false on failure
      */
-    public function rollBack()
+    public function rollBack(): bool
     {
         return $this->pdo->rollBack();
     }
 
     /**
      * Returns an array which represents a column from the result set.
-     *
-     * @param  string $query
-     * @param  array  $params
-     *
-     * @return array
      */
-    public function column($query, $params = null)
+    public function column(string $query, ?array $params = null): array
     {
         $this->Init($query, $params);
         $Columns = $this->sQuery->fetchAll(PDO::FETCH_NUM);
@@ -337,14 +284,8 @@ class Db
 
     /**
      * Returns an array which represents a row from the result set.
-     *
-     * @param  string $query
-     * @param  array  $params
-     * @param  int    $fetchmode
-     *
-     * @return array
      */
-    public function row($query, $params = null, $fetchmode = PDO::FETCH_ASSOC)
+    public function row(string $query, ?array $params = null, int $fetchmode = PDO::FETCH_ASSOC): array
     {
         $this->Init($query, $params);
         $result = $this->sQuery->fetch($fetchmode);
@@ -354,13 +295,8 @@ class Db
 
     /**
      * Returns the value of one single field/column.
-     *
-     * @param  string $query
-     * @param  array  $params
-     *
-     * @return string
      */
-    public function single($query, $params = null)
+    public function single(string $query, ?array $params = null): string
     {
         $this->Init($query, $params);
         $result = $this->sQuery->fetchColumn();
@@ -384,7 +320,7 @@ class Db
 	 * @param mixed|null $value_defaut
 	 * @return mixed|null
 	 */
-    public function variable_get($var_name, $value_defaut = null)
+    public function variable_get(string $var_name, $value_defaut = null)
     {
         $params = ['name' => $var_name];
         $result = $this->query("
@@ -406,7 +342,7 @@ class Db
 	 * @param mixed $value
 	 * @return array|int|null
 	 */
-    public function variable_save($var_name, $value)
+    public function variable_save(string $var_name, $value)
     {
         $params = [
             'name' => $var_name,
@@ -432,7 +368,7 @@ class Db
 	 * @param string $var_name
 	 * @return array|int|null
 	 */
-    public function variable_delete($var_name)
+    public function variable_delete(string $var_name)
     {
         return $this->query("DELETE FROM `{$this->table['variable']}` WHERE name = :name LIMIT 1", ['name' => $var_name]);
     }

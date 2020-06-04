@@ -39,7 +39,7 @@ d($person->sum('age'), 'Sum persons age');
 d($person->avg('age'), 'Average persons age');
 d($person->count('id'), 'Count persons');
 
-function d($value, $title = '')
+function d(string $value, string $title = ''): void
 {
     echo '<pre>';
     echo '<h1>'.$title.'</h1>';
