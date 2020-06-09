@@ -1,10 +1,5 @@
 <?php
-use Jgauthi\Component\Database\Db;
-
-require_once 'vendor/autoload.php';
-
-// Creates the instance
-$db = new Db();
+require_once __DIR__.'/includes/init.php';
 
 // 3 ways to bind parameters :
 
@@ -47,13 +42,6 @@ $update = $db->query('UPDATE Persons SET firstname = :f WHERE Id = :id', ['f' =>
 // Delete statement
 //	$delete	 	 =  $db->query("DELETE FROM Persons WHERE Id = :id",array("id"=>"6"));
 
-function d(string $value, string $title = ''): void
-{
-    echo '<pre>';
-    echo '<h1>'.$title.'</h1>';
-    var_dump($value);
-    echo '</pre>';
-}
 
 //d($person, "All persons");
 d($id_age, 'Single Row, Id and Age');

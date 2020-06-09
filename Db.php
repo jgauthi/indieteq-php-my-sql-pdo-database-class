@@ -20,7 +20,7 @@ class Db
     private PDOStatement $sQuery;
     private array $settings;
     private bool $bConnected = false;
-    private $debug = false;
+    private bool $debug = false;
     private array $parameters;
     public array $table = [];
 
@@ -166,7 +166,7 @@ class Db
     /**
      * Add the parameter to the parameter array
      */
-    public function bind(string $para, ?string $value): self
+    public function bind(string $para, $value): self
     {
         $this->parameters[sizeof($this->parameters)] = [':'.$para, $value];
         return $this;
