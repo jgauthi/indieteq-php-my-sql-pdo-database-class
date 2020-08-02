@@ -28,7 +28,10 @@ use Jgauthi\Component\Database\Db;
 require('vendor/autoload.php');
 
 // The instance
-$db = new db($dbhost, $dbuser, $dbpass, $dbname, $dbport = 3306);
+$db = db::init($dbhost, $dbuser, $dbpass, $dbname, $dbport = 3306);
+
+// Or by PDO Instance
+$db = new db($pdo);
 ```
 
 ### 3.  Display error

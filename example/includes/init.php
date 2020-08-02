@@ -19,4 +19,4 @@ function d($value, $title = '')
 }
 
 // Creates the instance
-$db = new db($dbhost, $dbuser, $dbpass, $dbname, $dbport);
+$db = db::init($dbhost, $dbuser, $dbpass, $dbname, $dbport);

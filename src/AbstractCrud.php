@@ -1,6 +1,6 @@
 <?php
 /**
- * Easy Crud  -  This class kinda works like ORM. Just created for fun :).
+ * Easy Crud  -  This class kinda works like ORM.
  *
  * @author       Vivek Wicky Aswal. (https://twitter.com/#!/VivekWickyAswal)
  * @contrib      jgauthi (https://github.com/jgauthi)
