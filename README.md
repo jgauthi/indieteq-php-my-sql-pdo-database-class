@@ -32,7 +32,23 @@ $db = db::init($dbhost, $dbuser, $dbpass, $dbname, $dbport = 3306);
 
 // Or by PDO Instance
 $db = new db($pdo);
+
+// Or by ini FILE
+$db = db::initByIni('database.ini');
 ```
+
+The ini file must be have this fields _([client], charset, port are optional)_:
+
+```ini
+[client]
+host=localhost
+user=root
+password=password
+dbname=dev
+port=3306
+default-character-set=utf8
+```
+
 
 ### 3.  Display error
 The original log class was removed and replace by php classic function: [trigger_error](http://www.php.net/manual/en/function.trigger-error.php). With this use, the error are log in the error_log system. You can active debug with `$db->setDebug(true);`, to display query request on error.
