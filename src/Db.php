@@ -47,16 +47,13 @@ class Db
     static public function init($host, $user, $pass, $dbname, $port = 3306)
     {
         $pdo = new PDO("mysql:dbname={$dbname};host={$host};port={$port}", $user, $pass, [
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8 COLLATE utf8_unicode_ci',
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // Log any exceptions on Fatal error
             // Disable emulation of prepared statements, use REAL prepared statements instead
             PDO::ATTR_EMULATE_PREPARES => false,
         ]);
 
-        $class = __CLASS__;
-        $db = new $class($pdo);
-
-        return $db;
+        return new self($pdo);
     }
 
     /**
@@ -91,10 +88,7 @@ class Db
             );
         }
 
-        $class = __CLASS__;
-        $db = $class::init($ini['host'], $ini['user'], $ini['password'], $ini['dbname'], ((!empty($ini['port'])) ? $ini['port'] : 3306));
-
-        return $db;
+        return self::init($ini['host'], $ini['user'], $ini['password'], $ini['dbname'], ((!empty($ini['port'])) ? $ini['port'] : 3306));
     }
 
     // You can use this little method if you want to close the PDO connection
